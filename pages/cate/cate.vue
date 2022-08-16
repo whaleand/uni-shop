@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<my-search></my-search>
 		<view class="scroll-view-container">
 			<!-- 左边 -->
 			<scroll-view class="left-scroll-container" scroll-y="true" :style="{height:winH+'px'}">
@@ -69,7 +70,7 @@
 		},
 		onLoad(){
 			const sysInfo=uni.getSystemInfoSync()
-			this.winH=sysInfo.windowHeight
+			this.winH=sysInfo.windowHeight-50
 			this.getCateList()
 		}
 	}
