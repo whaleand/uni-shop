@@ -22,7 +22,7 @@
 				</view>
 			</view>
 			<view class="yf">
-				快递，免运费
+				快递，免运费{{cart.length}}
 			</view>
 		</view>
 		<!-- 商品详情 -->
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+	import {mapState,mapMutations,mapGetters} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -46,7 +47,7 @@
 				}, {
 					icon: 'cart',
 					text: '购物车',
-					info: 8
+					info: 0
 				}],
 				buttonGroup: [{
 						text: '加入购物车',
@@ -62,7 +63,26 @@
 
 			}
 		},
+		computed:{
+			...mapState('m_cart',['cart']),
+			...mapGetters('m_cart',['total'])
+		},
+		watch:{
+			// 方法形式第一次不会触发,改成对象形式
+			// total(newVal){
+			// 	// const find
+			// 	this.options[1].info=newVal
+			// }
+			total:{
+				handler(newVal){
+				// const find
+				this.options[1].info=newVal
+			},
+			immediate:true
+			}
+		},
 		methods: {
+			...mapMutations('m_cart',['addCart']),
 			async getGoodsDetail(goods_id) {
 				const {
 					data: res
@@ -81,15 +101,29 @@
 					current: i,
 					urls: this.goods_info.pics.map(item => item.pics_big)
 				})
+			},
+			onClick(e){
+				if(e.content.text==='购物车'){
+					uni.switchTab({
+						url:'/pages/cart/cart'
+					})
+				}
+			},
+			buttonClick(e){
+				if(e.content.text==="加入购物车"){
+					const goods={
+						goods_id:this.goods_info.goods_id,
+						goods_name:this.goods_info.goods_name,
+						goods_price:this.goods_info.goods_price,
+						goods_count:1,
+						goods_small_logo:this.goods_info.goods_small_logo,
+						goods_small_state:true
+					}
+					this.addCart(goods)
+				}
 			}
 		},
-		onClick(e){
-			if(e.content.text==='购物车'){
-				uni.switchTab({
-					url:'/pages/cart/cart'
-				})
-			}
-		},
+		
 		onLoad(options) {
 			const goods_id = options.goods_id
 			this.getGoodsDetail(goods_id)
